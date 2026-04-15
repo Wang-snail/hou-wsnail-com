@@ -1,0 +1,347 @@
+[
+  {
+    "id": "N-001",
+    "name": "利润计算器",
+    "category": "供应链与成本",
+    "description": "根据成本、售价、销量计算利润和利润率",
+    "source": "基础",
+    "inputs": [
+      { "key": "成本", "label": "单件成本", "unit": "USD", "defaultValue": 10 },
+      { "key": "售价", "label": "售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "销售量", "label": "月销量", "unit": "件", "defaultValue": 100 }
+    ],
+    "logic": "利润 = (售价 - 成本) * 销售量;\n利润率 = 利润 / 售价;",
+    "outputs": [
+      { "key": "利润", "label": "月利润", "unit": "USD" },
+      { "key": "利润率", "label": "利润率", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-002",
+    "name": "采购成本计算",
+    "category": "供应链与成本",
+    "description": "双供应商报价取均值，含关税，偏差>15%需第三家（R01）",
+    "source": "R01",
+    "inputs": [
+      { "key": "报价A", "label": "供应商A报价（FOB）", "unit": "USD/件", "defaultValue": 8 },
+      { "key": "报价B", "label": "供应商B报价（FOB）", "unit": "USD/件", "defaultValue": 9 },
+      { "key": "关税税率", "label": "关税税率", "unit": "%", "defaultValue": 0.25 }
+    ],
+    "logic": "采购均价 = (报价A + 报价B) / 2;\n采购成本 = 采购均价 * (1 + 关税税率);\n偏差率 = Math.abs(报价A - 报价B) / 采购均价;",
+    "outputs": [
+      { "key": "采购均价", "label": "采购均价", "unit": "USD/件" },
+      { "key": "采购成本", "label": "含税采购成本", "unit": "USD/件" },
+      { "key": "偏差率", "label": "报价偏差率", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-003",
+    "name": "平台成本计算",
+    "category": "供应链与成本",
+    "description": "FBA配送费 + 类目佣金（R01）",
+    "source": "R01",
+    "inputs": [
+      { "key": "FBA费", "label": "FBA配送费", "unit": "USD/件", "defaultValue": 3.56 },
+      { "key": "售价", "label": "售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "佣金率", "label": "平台佣金率", "unit": "%", "defaultValue": 0.15 }
+    ],
+    "logic": "佣金 = 售价 * 佣金率;\n平台成本 = FBA费 + 佣金;",
+    "outputs": [
+      { "key": "佣金", "label": "平台佣金", "unit": "USD/件" },
+      { "key": "平台成本", "label": "平台总成本", "unit": "USD/件" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-004",
+    "name": "头程物流成本",
+    "category": "供应链与成本",
+    "description": "双货代报价取均值，计算单件头程费用（R01）",
+    "source": "R01",
+    "inputs": [
+      { "key": "货代A", "label": "货代A总报价", "unit": "USD", "defaultValue": 1200 },
+      { "key": "货代B", "label": "货代B总报价", "unit": "USD", "defaultValue": 1100 },
+      { "key": "首批件数", "label": "首批件数", "unit": "件", "defaultValue": 500 }
+    ],
+    "logic": "物流均价 = (货代A + 货代B) / 2;\n单件头程费 = 物流均价 / 首批件数;\n偏差率 = Math.abs(货代A - 货代B) / 物流均价;",
+    "outputs": [
+      { "key": "物流均价", "label": "物流均价", "unit": "USD" },
+      { "key": "单件头程费", "label": "单件头程费", "unit": "USD/件" },
+      { "key": "偏差率", "label": "报价偏差率", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-005",
+    "name": "单件净利润",
+    "category": "ROI模块",
+    "description": "售价扣除所有成本和费用后的单件净利润（R02）",
+    "source": "R02",
+    "inputs": [
+      { "key": "售价", "label": "售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "采购成本", "label": "含税采购成本", "unit": "USD/件", "defaultValue": 10 },
+      { "key": "平台成本", "label": "FBA+佣金", "unit": "USD/件", "defaultValue": 5.31 },
+      { "key": "单件头程费", "label": "单件头程费", "unit": "USD/件", "defaultValue": 2.2 },
+      { "key": "ACoS", "label": "ACoS（广告销售比）", "unit": "%", "defaultValue": 0.8 },
+      { "key": "退货率", "label": "退货率", "unit": "%", "defaultValue": 0.03 }
+    ],
+    "logic": "广告费 = 售价 * ACoS;\n退货损耗 = 售价 * 退货率;\n净利润 = 售价 - 采购成本 - 平台成本 - 单件头程费 - 广告费 - 退货损耗;\n净利率 = 净利润 / 售价;",
+    "outputs": [
+      { "key": "广告费", "label": "单件广告费", "unit": "USD" },
+      { "key": "净利润", "label": "单件净利润", "unit": "USD" },
+      { "key": "净利率", "label": "净利率", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-006",
+    "name": "三套情景P&L",
+    "category": "ROI模块",
+    "description": "保守/中性/乐观三套假设下的净利润和净利率（R02）",
+    "source": "R02",
+    "inputs": [
+      { "key": "售价", "label": "中性售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "单件总成本", "label": "单件总成本（含头程）", "unit": "USD", "defaultValue": 17.5 },
+      { "key": "ACoS中性", "label": "ACoS（中性）", "unit": "%", "defaultValue": 0.8 },
+      { "key": "退货率中性", "label": "退货率（中性）", "unit": "%", "defaultValue": 0.03 }
+    ],
+    "logic": "保守净利润 = 售价*0.9 - 单件总成本 - 售价*0.9*ACoS中性*1.4 - 售价*0.9*退货率中性*1.6;\n保守净利率 = 保守净利润 / (售价*0.9);\n中性净利润 = 售价 - 单件总成本 - 售价*ACoS中性 - 售价*退货率中性;\n中性净利率 = 中性净利润 / 售价;\n乐观净利润 = 售价*1.1 - 单件总成本*0.95 - 售价*1.1*ACoS中性*0.6 - 售价*1.1*退货率中性*0.67;\n乐观净利率 = 乐观净利润 / (售价*1.1);",
+    "outputs": [
+      { "key": "保守净利润", "label": "保守净利润", "unit": "USD" },
+      { "key": "保守净利率", "label": "保守净利率", "unit": "%" },
+      { "key": "中性净利润", "label": "中性净利润", "unit": "USD" },
+      { "key": "中性净利率", "label": "中性净利率", "unit": "%" },
+      { "key": "乐观净利润", "label": "乐观净利润", "unit": "USD" },
+      { "key": "乐观净利率", "label": "乐观净利率", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-007",
+    "name": "盈亏平衡销量",
+    "category": "ROI模块",
+    "description": "月固定成本 ÷ 单件边际贡献（R02）",
+    "source": "R02",
+    "inputs": [
+      { "key": "月固定成本", "label": "月固定成本（广告+运营）", "unit": "USD", "defaultValue": 500 },
+      { "key": "售价", "label": "售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "单件变动成本", "label": "单件变动成本", "unit": "USD", "defaultValue": 18 }
+    ],
+    "logic": "盈亏平衡销量 = 月固定成本 / (售价 - 单件变动成本);",
+    "outputs": [
+      { "key": "盈亏平衡销量", "label": "盈亏平衡销量", "unit": "件/月" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-008",
+    "name": "首批资金需求",
+    "category": "ROI模块",
+    "description": "采购+头程+广告+认证费用汇总（R03）",
+    "source": "R03",
+    "inputs": [
+      { "key": "首批件数", "label": "首批件数", "unit": "件", "defaultValue": 500 },
+      { "key": "单件采购成本", "label": "单件含税采购成本", "unit": "USD", "defaultValue": 10 },
+      { "key": "头程总费用", "label": "头程总费用", "unit": "USD", "defaultValue": 1150 },
+      { "key": "广告预算", "label": "启动广告预算（月）", "unit": "USD", "defaultValue": 800 },
+      { "key": "认证费用", "label": "认证费用", "unit": "USD", "defaultValue": 300 }
+    ],
+    "logic": "采购总额 = 首批件数 * 单件采购成本;\n首批资金 = 采购总额 + 头程总费用 + 广告预算 + 认证费用;",
+    "outputs": [
+      { "key": "采购总额", "label": "采购总额", "unit": "USD" },
+      { "key": "首批资金", "label": "首批资金需求", "unit": "USD" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-009",
+    "name": "年化ROI",
+    "category": "ROI模块",
+    "description": "批次ROI折算为年化收益率（R03）",
+    "source": "R03",
+    "inputs": [
+      { "key": "批次净利润", "label": "批次净利润", "unit": "USD", "defaultValue": 3000 },
+      { "key": "首批投入", "label": "首批总投入", "unit": "USD", "defaultValue": 7250 },
+      { "key": "周转天数", "label": "资金周转天数", "unit": "天", "defaultValue": 105 }
+    ],
+    "logic": "批次ROI = 批次净利润 / 首批投入;\n年化ROI = 批次ROI * (365 / 周转天数);",
+    "outputs": [
+      { "key": "批次ROI", "label": "单批次ROI", "unit": "%" },
+      { "key": "年化ROI", "label": "年化ROI", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-010",
+    "name": "补货阈值",
+    "category": "ROI模块",
+    "description": "库存低于此值时触发补货（R03）",
+    "source": "R03",
+    "inputs": [
+      { "key": "日均销量", "label": "日均销量", "unit": "件/天", "defaultValue": 17 },
+      { "key": "头程天数", "label": "头程时效", "unit": "天", "defaultValue": 35 }
+    ],
+    "logic": "补货阈值 = 日均销量 * (头程天数 + 14);",
+    "outputs": [
+      { "key": "补货阈值", "label": "补货触发库存", "unit": "件" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-011",
+    "name": "最坏情景损失",
+    "category": "ROI模块",
+    "description": "销量×50%，售价-15%，成本+10% 的压力测试（R04）",
+    "source": "R04",
+    "inputs": [
+      { "key": "正常月销量", "label": "中性月销量", "unit": "件", "defaultValue": 300 },
+      { "key": "正常售价", "label": "中性售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "单件总成本", "label": "单件总成本", "unit": "USD", "defaultValue": 18 }
+    ],
+    "logic": "最坏销量 = 正常月销量 * 0.5;\n最坏售价 = 正常售价 * 0.85;\n最坏成本 = 单件总成本 * 1.1;\n月亏损 = (最坏售价 - 最坏成本) * 最坏销量;",
+    "outputs": [
+      { "key": "最坏销量", "label": "最坏月销量", "unit": "件" },
+      { "key": "最坏售价", "label": "最坏售价", "unit": "USD" },
+      { "key": "月亏损", "label": "最坏月盈亏", "unit": "USD" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-012",
+    "name": "风险敞口比例",
+    "category": "ROI模块",
+    "description": "总亏损占首批资金的比例，>30%触发否决（R04）",
+    "source": "R04",
+    "inputs": [
+      { "key": "总亏损", "label": "预计最坏总亏损", "unit": "USD", "defaultValue": 2000 },
+      { "key": "首批资金", "label": "首批资金", "unit": "USD", "defaultValue": 7250 }
+    ],
+    "logic": "风险敞口比例 = 总亏损 / 首批资金;",
+    "outputs": [
+      { "key": "风险敞口比例", "label": "风险敞口比例", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-013",
+    "name": "月GMV估算",
+    "category": "市场潜力",
+    "description": "前100 ASIN总销量 × 平均售价（PL01）",
+    "source": "PL01",
+    "inputs": [
+      { "key": "Top100总销量", "label": "前100 ASIN月总销量", "unit": "件", "defaultValue": 50000 },
+      { "key": "平均售价", "label": "市场平均售价", "unit": "USD", "defaultValue": 22 }
+    ],
+    "logic": "月GMV = Top100总销量 * 平均售价;",
+    "outputs": [
+      { "key": "月GMV", "label": "市场月GMV", "unit": "USD" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-014",
+    "name": "市场趋势判断",
+    "category": "市场潜力",
+    "description": "后12月均值 ÷ 前12月均值 = 趋势比率 R（PL01）",
+    "source": "PL01",
+    "inputs": [
+      { "key": "后12月均值", "label": "近12月平均月销量", "unit": "件", "defaultValue": 5500 },
+      { "key": "前12月均值", "label": "前12月平均月销量", "unit": "件", "defaultValue": 5000 }
+    ],
+    "logic": "趋势比率 = 后12月均值 / 前12月均值;",
+    "outputs": [
+      { "key": "趋势比率", "label": "趋势比率 R", "unit": "" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-015",
+    "name": "季节性强度",
+    "category": "市场潜力",
+    "description": "峰谷比>3强季节性，1.5-3中，<1.5弱（PL01）",
+    "source": "PL01",
+    "inputs": [
+      { "key": "峰月销量", "label": "最高月销量", "unit": "件", "defaultValue": 8000 },
+      { "key": "谷月销量", "label": "最低月销量", "unit": "件", "defaultValue": 3000 }
+    ],
+    "logic": "峰谷比 = 峰月销量 / 谷月销量;",
+    "outputs": [
+      { "key": "峰谷比", "label": "峰谷比", "unit": "" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-016",
+    "name": "市场集中度",
+    "category": "市场潜力",
+    "description": "Top10销量占Top100的比例（PL01）",
+    "source": "PL01",
+    "inputs": [
+      { "key": "Top10销量", "label": "Top10 ASIN月总销量", "unit": "件", "defaultValue": 20000 },
+      { "key": "Top100销量", "label": "Top100 ASIN月总销量", "unit": "件", "defaultValue": 50000 }
+    ],
+    "logic": "集中度 = Top10销量 / Top100销量;",
+    "outputs": [
+      { "key": "集中度", "label": "集中度系数", "unit": "%" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-017",
+    "name": "竞争强度得分",
+    "category": "竞争格局",
+    "description": "五维度加权竞争壁垒评分（PL02）",
+    "source": "PL02",
+    "inputs": [
+      { "key": "Review壁垒分", "label": "Review壁垒（0-5分）", "defaultValue": 3 },
+      { "key": "年龄壁垒分", "label": "在架年龄壁垒（0-5分）", "defaultValue": 2 },
+      { "key": "品牌壁垒分", "label": "品牌壁垒（0-5分）", "defaultValue": 2 },
+      { "key": "CPC壁垒分", "label": "CPC壁垒（0-5分）", "defaultValue": 2 },
+      { "key": "自营壁垒分", "label": "Amazon自营壁垒（0-5分）", "defaultValue": 1 }
+    ],
+    "logic": "竞争强度得分 = Review壁垒分*0.3 + 年龄壁垒分*0.2 + 品牌壁垒分*0.2 + CPC壁垒分*0.15 + 自营壁垒分*0.15;",
+    "outputs": [
+      { "key": "竞争强度得分", "label": "竞争强度综合得分", "unit": "分" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-018",
+    "name": "决策加权得分",
+    "category": "决策信息",
+    "description": "五维度决策矩阵加权评分，≥3.5建议进入（M5）",
+    "source": "M5",
+    "inputs": [
+      { "key": "市场潜力分", "label": "市场潜力（1/3/5分）", "defaultValue": 3 },
+      { "key": "进入难度分", "label": "进入难度（1/3/5分）", "defaultValue": 3 },
+      { "key": "盈利预期分", "label": "盈利预期（1/3/5分）", "defaultValue": 3 },
+      { "key": "需求清晰度分", "label": "需求清晰度（1/3/5分）", "defaultValue": 3 },
+      { "key": "风险可控分", "label": "风险可控（1/3/5分）", "defaultValue": 3 }
+    ],
+    "logic": "决策得分 = 市场潜力分*0.25 + 进入难度分*0.2 + 盈利预期分*0.25 + 需求清晰度分*0.15 + 风险可控分*0.15;",
+    "outputs": [
+      { "key": "决策得分", "label": "决策加权总分", "unit": "分" }
+    ],
+    "status": "published"
+  },
+  {
+    "id": "N-019",
+    "name": "广告费用估算",
+    "category": "平台模块",
+    "description": "基于目标ACoS和售价估算广告预算（PL04）",
+    "source": "PL04",
+    "inputs": [
+      { "key": "月目标销量", "label": "月目标销量", "unit": "件", "defaultValue": 300 },
+      { "key": "售价", "label": "售价", "unit": "USD", "defaultValue": 25 },
+      { "key": "ACoS", "label": "目标ACoS", "unit": "%", "defaultValue": 0.8 }
+    ],
+    "logic": "月销售额 = 月目标销量 * 售价;\n月广告预算 = 月销售额 * ACoS;",
+    "outputs": [
+      { "key": "月销售额", "label": "月销售额", "unit": "USD" },
+      { "key": "月广告预算", "label": "月广告预算", "unit": "USD" }
+    ],
+    "status": "published"
+  }
+]

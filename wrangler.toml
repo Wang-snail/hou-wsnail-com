@@ -1,0 +1,8 @@
+name = "wz-main"
+compatibility_date = "2024-04-01"
+pages_build_output_dir = "dist"
+
+[[kv_namespaces]]
+binding = "NODES_KV"
+id = "d09d8db2286041a398a2b94efbcd70bf"
+preview_id = "53d71951a5554046822c948a4270ec21"

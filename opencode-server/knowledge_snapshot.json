@@ -1,0 +1,149 @@
+{
+  "version": "1.0-web-standalone",
+  "snapshot_date": "2026-04-10",
+  "source": "OpenCode Memory Palace",
+  
+  "market_rules": {
+    "cr10_decision_table": {
+      ">70%": {
+        "action": "reject",
+        "reason": "高度垄断，风险极高",
+        "confidence": "high"
+      },
+      "40-70%": {
+        "action": "cautious",
+        "reason": "寡占型，需强差异化",
+        "confidence": "medium"
+      },
+      "<40%": {
+        "action": "enter",
+        "reason": "竞争型，有机会",
+        "confidence": "high"
+      }
+    },
+    "hhi_thresholds": {
+      "<1000": "竞争型市场",
+      "1000-2000": "中度集中",
+      ">2000": "高度集中（谨慎）"
+    }
+  },
+  
+  "rational_framework": {
+    "layers": {
+      "L1_cognitive_defense": {
+        "name": "认知防御层",
+        "rhetoric_types": [
+          "情感共鸣（彻底改变/革命性/颠覆性）",
+          "权威暗示（据权威专家/官方数据）",
+          "稀缺性（仅剩名额/限时优惠）",
+          "术语堆砌（AI赋能生态闭环）"
+        ]
+      },
+      "L2_validation_workflow": {
+        "name": "验证工作流",
+        "method": "三角验证法",
+        "min_sources": 3,
+        "source_hierarchy": {
+          "官方财报": 1.0,
+          "官方公告": 0.95,
+          "权威第三方": 0.8,
+          "行业媒体": 0.6,
+          "分析师报告": 0.5,
+          "网络媒体": 0.3,
+          "匿名来源": 0.1
+        }
+      },
+      "L3_structured_analysis": {
+        "name": "结构化分析",
+        "method": "MECE拆解",
+        "principle": "相互独立，完全穷尽"
+      },
+      "L4_calibration": {
+        "name": "持续校准",
+        "confidence_scoring": "0-100分",
+        "expression_rules": {
+          "≥80": "数据显示（高置信度）",
+          "60-79": "倾向于认为（中等置信度）",
+          "40-59": "初步判断（低置信度）",
+          "<40": "基于有限信息推测（极低置信度）"
+        }
+      }
+    }
+  },
+  
+  "coding_standards": {
+    "immutability": {
+      "rule": "ALWAYS创建新对象，NEVER修改现有对象",
+      "example_wrong": "modify(original, field, value)",
+      "example_correct": "update(original, field, value)"
+    },
+    "error_handling": [
+      "在每一层显式处理错误",
+      "永不静默吞掉错误",
+      "提供用户友好的错误消息",
+      "服务器端记录详细错误上下文"
+    ],
+    "input_validation": [
+      "在系统边界验证所有用户输入",
+      "使用schema-based验证（如Zod）",
+      "快速失败，清晰错误消息",
+      "永不信任外部数据"
+    ],
+    "quality_checklist": [
+      "代码可读且命名良好",
+      "函数小（<50行）",
+      "文件聚焦（<800行）",
+      "无深层嵌套（>4层）",
+      "正确的错误处理",
+      "无硬编码值",
+      "无原地修改（使用不可变模式）"
+    ]
+  },
+  
+  "team_structure": {
+    "roles": {
+      "orchestrator": "团队协调、任务分配、进度跟踪",
+      "architect": "系统架构设计、技术选型、模块划分",
+      "planner": "实现规划、任务拆解、优先级排序",
+      "developer": "核心编码实现、代码编写",
+      "reviewer": "代码审查、质量把控、最佳实践检查",
+      "tester": "测试验证、用例设计、边界测试",
+      "doc-writer": "文档更新、API文档、使用说明"
+    },
+    "workflow": [
+      "用户请求",
+      "↓ orchestrator（评估复杂度）",
+      "├─ 简单 → 直接执行",
+      "└─ 复杂 → 团队协作",
+      "    ↓ architect（架构设计）",
+      "    ↓ planner（实现规划）",
+      "    ↓ developer（编码实现）",
+      "    ↓ reviewer（代码审查）",
+      "    ↓ tester（测试验证）",
+      "    ↓ doc-writer（文档更新）",
+      "    ↓ orchestrator（汇总交付）"
+    ]
+  },
+  
+  "web_capabilities": {
+    "preserved": [
+      "市场分析决策建议（基于CR/HHI规则）",
+      "理性分析框架（话术识别、置信度评分）",
+      "编码规范查询和检查",
+      "团队协作模式说明",
+      "知识检索（基于静态快照）"
+    ],
+    "limited": [
+      "无动态记忆进化（知识快照）",
+      "无ChromaDB语义搜索（仅关键词匹配）",
+      "无实时对话归档",
+      "无知识图谱可视化"
+    ],
+    "removed": [
+      "本地文件系统操作",
+      "Python代码执行",
+      "实时项目文件监控",
+      "自动化工作流触发"
+    ]
+  }
+}
