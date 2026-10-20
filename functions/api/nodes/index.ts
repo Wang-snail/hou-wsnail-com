@@ -2,11 +2,15 @@
  * GET  /api/nodes        — 全量节点列表（后台管理用）
  * POST /api/nodes        — 新增节点
  */
-import { ok, err, preflight, kvGetNodes, kvSaveNodes, SEED_NODES, type AppNode, type Env } from './_shared';
+import { ok, err, preflight, requireAuth, kvGetNodes, kvSaveNodes, SEED_NODES, type AppNode, type Env } from './_shared';
 
 export async function onRequest(context: EventContext<Env, string, {}>) {
   const { request, env } = context;
   if (request.method === 'OPTIONS') return preflight();
+
+  // 认证检查（所有操作都需要认证）
+  const authError = requireAuth(request, env);
+  if (authError) return authError;
 
   const kv = env.NODES_KV;
 
