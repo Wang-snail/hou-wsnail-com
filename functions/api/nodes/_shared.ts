@@ -8,7 +8,7 @@
 export const CORS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export function cors(res: Response): Response {
@@ -27,6 +27,49 @@ export function err(error: string, status = 400): Response {
 
 export function preflight(): Response {
   return new Response(null, { status: 204, headers: CORS });
+}
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+/**
+ * 验证 Bearer token（恒定时间比较）
+ * Authorization: Bearer <ADMIN_TOKEN>
+ */
+export function requireAuth(request: Request, env: Env): Response | null {
+  const adminToken = env.ADMIN_TOKEN;
+  if (!adminToken) {
+    return err('Server misconfiguration: ADMIN_TOKEN not set', 500);
+  }
+
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return err('Unauthorized: missing or invalid Authorization header', 401);
+  }
+
+  const token = authHeader.slice(7); // Remove 'Bearer '
+  
+  // Constant-time comparison to prevent timing attacks
+  if (!timingSafeEqual(token, adminToken)) {
+    return err('Unauthorized: invalid token', 401);
+  }
+
+  return null; // Auth passed
+}
+
+/**
+ * 恒定时间字符串比较（防止时序攻击）
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    // Still compare something to keep timing constant
+    b = a;
+  }
+  
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  
+  return result === 0 && a.length === b.length;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -63,6 +106,7 @@ export interface KVNamespace {
 
 export interface Env {
   NODES_KV?: KVNamespace;
+  ADMIN_TOKEN?: string;
 }
 
 // ─── KV helpers ───────────────────────────────────────────────────────────────
