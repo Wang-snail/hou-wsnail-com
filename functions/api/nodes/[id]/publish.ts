@@ -1,12 +1,16 @@
 /**
  * POST /api/nodes/:id/publish — 发布节点
  */
-import { ok, err, preflight, kvGetNodes, kvSaveNodes, type Env } from '../_shared';
+import { ok, err, preflight, requireAuth, kvGetNodes, kvSaveNodes, type Env } from '../_shared';
 
 export async function onRequest(context: EventContext<Env, string, { id: string }>) {
   const { request, env, params } = context;
   if (request.method === 'OPTIONS') return preflight();
   if (request.method !== 'POST') return err('Method not allowed', 405);
+
+  // 认证检查
+  const authError = requireAuth(request, env);
+  if (authError) return authError;
 
   const kv = env.NODES_KV;
   if (!kv) return err('KV storage not configured', 503);

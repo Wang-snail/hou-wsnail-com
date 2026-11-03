@@ -3,11 +3,15 @@
  * PUT    /api/nodes/:id  — 更新节点
  * DELETE /api/nodes/:id  — 删除节点
  */
-import { ok, err, preflight, kvGetNodes, kvSaveNodes, type AppNode, type Env } from '../_shared';
+import { ok, err, preflight, requireAuth, kvGetNodes, kvSaveNodes, type AppNode, type Env } from '../_shared';
 
 export async function onRequest(context: EventContext<Env, string, { id: string }>) {
   const { request, env, params } = context;
   if (request.method === 'OPTIONS') return preflight();
+
+  // 认证检查（所有操作都需要认证）
+  const authError = requireAuth(request, env);
+  if (authError) return authError;
 
   const id = params.id;
   const kv = env.NODES_KV;

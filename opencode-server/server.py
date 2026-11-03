@@ -172,4 +172,10 @@ def health():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3007, debug=True)
+    # 安全配置：默认绑定到 127.0.0.1（仅本地访问）
+    # 通过环境变量可覆盖：FLASK_HOST, FLASK_PORT, FLASK_DEBUG
+    host = os.environ.get('FLASK_HOST', '127.0.0.1')
+    port = int(os.environ.get('FLASK_PORT', '3007'))
+    debug = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
+    
+    app.run(host=host, port=port, debug=debug)
